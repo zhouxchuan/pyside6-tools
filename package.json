@@ -1,0 +1,68 @@
+{
+    "name": "pyside6-tools",
+    "displayName": "PySide6 Tools",
+    "description": "Qt Designer and UI Compiler Tools for PySide6",
+    "version": "1.0.0",
+    "publisher": "zhou-xiao-chuan",
+    "repository": {
+        "url": "https://gitee.com/zhou-xiao-chuan/pyside6-tools"
+    },
+    "engines": {
+        "vscode": "^1.60.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "keywords": [
+        "qt",
+        "designer",
+        "uic",
+        "pyside6"
+    ],
+    "icon": "images/icon.png",
+    "main": "./extension.js",
+    "activationEvents": [
+        "onCommand:pyside6.openDesigner",
+        "onCommand:pyside6.compileUI"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "pyside6.openDesigner",
+                "title": "Open in PySide6 Designer",
+                "category": "PySide6"
+            },
+            {
+                "command": "pyside6.compileUI",
+                "title": "Compile UI with PySide6 UIC",
+                "category": "PySide6"
+            }
+        ],
+        "menus": {
+            "editor/context": [
+                {
+                    "command": "pyside6.openDesigner",
+                    "group": "PySide6@1",
+                    "when": "resourceExtname == .ui"
+                },
+                {
+                    "command": "pyside6.compileUI",
+                    "group": "PySide6@2",
+                    "when": "resourceExtname == .ui"
+                }
+            ],
+            "explorer/context": [
+                {
+                    "command": "pyside6.openDesigner",
+                    "group": "PySide6@1",
+                    "when": "resourceExtname == .ui"
+                },
+                {
+                    "command": "pyside6.compileUI",
+                    "group": "PySide6@2",
+                    "when": "resourceExtname == .ui"
+                }
+            ]
+        }
+    }
+}

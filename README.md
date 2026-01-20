@@ -1,37 +1,27 @@
-# pyside6-tools
+# PySide6 Tools Extension
 
-#### 介绍
-A simple extension tools of vscode for pyside6-designer and pyside6-uic
+A tools for PySide6 Designer (pyside6-designer) and UI Compiler (pyside6-uic) on the context menu of vscodefile explorer。
 
-#### 软件架构
-软件架构说明
+## Features
 
+- **Open in PySide6 Designer**: Open a .ui file in pySide6-designer
+- **Compile UI with PySide6 UIC**: Compile a .ui file with pyside6-uic
 
-#### 安装教程
+## Usage
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1. In the file explorer or editor, right-click on a .ui file
+2. Select "PySide6 Designer" or "Compile UI with PySide6 UIC" menu
+3. Select the desired feature
 
-#### 使用说明
+## Requirements
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- PySide6 is installed and available in .venv/Scripts directory
+- VSCode 1.60.0 or higher version
 
-#### 参与贡献
+## Author
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+- Zhou Xiaochuan
 
+## License
 
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+MIT License
