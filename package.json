@@ -2,7 +2,7 @@
     "name": "pyside6-tools",
     "displayName": "PySide6 Tools",
     "description": "Qt Designer and UI Compiler Tools for PySide6",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "publisher": "zhou-xiao-chuan",
     "repository": {
         "url": "https://gitee.com/zhou-xiao-chuan/pyside6-tools"
@@ -24,6 +24,14 @@
     "activationEvents": [
         "onCommand:pyside6.openDesigner",
         "onCommand:pyside6.compileUI"
+    ],
+    "files": [
+        "package.json",
+        "extension.js",
+        "images/icon.png",
+        "CHANGELOG.md",
+        "LICENSE.md",
+        "README.md"
     ],
     "contributes": {
         "commands": [
@@ -63,6 +71,33 @@
                     "when": "resourceExtname == .ui"
                 }
             ]
+        },
+        "configuration": {
+            "title": "PySide6 Tools",
+            "properties": {
+                "pyside6.designerPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Path to pyside6-designer executable"
+                },
+                "pyside6.uicPath": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Path to pyside6-uic executable"
+                },
+                "pyside6.outputSuffix": {
+                    "type": "string",
+                    "default": "_ui",
+                    "description": "Suffix for compiled UI files"
+                }
+            }
         }
+    },
+    "devDependencies": {
+        "@vscode/test-electron": "^2.0.0",
+        "vsce": "^2.15.0"
+    },
+    "scripts": {
+        "package": "vsce package"
     }
 }

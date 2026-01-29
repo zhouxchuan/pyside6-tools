@@ -15,8 +15,16 @@ A tools for PySide6 Designer (pyside6-designer) and UI Compiler (pyside6-uic) on
 
 ## Requirements
 
-- PySide6 is installed and available in .venv/Scripts directory
+- PySide6 is installed and available
 - VSCode 1.60.0 or higher version
+
+## Configuration
+
+You can configure PySide6 Tools in VSCode settings:
+
+- `pyside6.designerPath`: Path to pyside6-designer executable (optional, extension will try to find it automatically)
+- `pyside6.uicPath`: Path to pyside6-uic executable (optional, extension will try to find it automatically)
+- `pyside6.outputSuffix`: Suffix for compiled UI files (default: \_ui)
 
 ## Author
 
