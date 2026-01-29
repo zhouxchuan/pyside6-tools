@@ -8,7 +8,7 @@ const os = require("os");
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-    console.log("PySide6 Tools 扩展已激活");
+    console.log("PySide6 Tools extension is now active");
 
     // 注册打开 Designer 命令
     let openDesigner = vscode.commands.registerCommand(
@@ -18,7 +18,7 @@ function activate(context) {
                 await openInDesigner(uri);
             } catch (error) {
                 vscode.window.showErrorMessage(
-                    `打开 Designer 失败: ${error.message}`,
+                    `Failed to open Designer: ${error.message}`,
                 );
             }
         },
@@ -32,14 +32,39 @@ function activate(context) {
                 await compileUIWithUIC(uri);
             } catch (error) {
                 vscode.window.showErrorMessage(
-                    `编译 UI 失败: ${error.message}`,
+                    `Failed to compile UI: ${error.message}`,
                 );
+            }
+        },
+    );
+
+    // 注册文件保存事件监听器，实现自动编译
+    let saveListener = vscode.workspace.onDidSaveTextDocument(
+        async (document) => {
+            // 检查是否是 .ui 文件
+            if (document.fileName.endsWith(".ui")) {
+                // 检查自动编译配置是否开启
+                const config = vscode.workspace.getConfiguration("pyside6");
+                const autoCompile = config.get("autoCompile");
+
+                if (autoCompile) {
+                    try {
+                        await compileUIWithUIC(
+                            vscode.Uri.file(document.fileName),
+                        );
+                    } catch (error) {
+                        vscode.window.showErrorMessage(
+                            `Failed to auto-compile UI: ${error.message}`,
+                        );
+                    }
+                }
             }
         },
     );
 
     context.subscriptions.push(openDesigner);
     context.subscriptions.push(compileUI);
+    context.subscriptions.push(saveListener);
 }
 
 /**
@@ -53,7 +78,7 @@ async function openInDesigner(uri) {
     const designerPath = await getDesignerPath();
     if (!designerPath) {
         vscode.window.showErrorMessage(
-            "未找到 pyside6-designer，请确保 PySide6 已正确安装并配置",
+            "Failed to find pyside6-designer, please ensure PySide6 is installed and configured correctly",
         );
         return;
     }
@@ -64,12 +89,12 @@ async function openInDesigner(uri) {
     exec(command, (error, stdout, stderr) => {
         if (error) {
             vscode.window.showErrorMessage(
-                `启动 Designer 失败: ${error.message}`,
+                `Failed to start Designer: ${error.message}`,
             );
-            console.error("Designer 错误:", error);
+            console.error("Designer error:", error);
             return;
         }
-        vscode.window.showInformationMessage("PySide6 Designer 已启动");
+        vscode.window.showInformationMessage("PySide6 Designer is now open");
     });
 }
 
@@ -84,7 +109,7 @@ async function compileUIWithUIC(uri) {
     const uicPath = await getUICPath();
     if (!uicPath) {
         vscode.window.showErrorMessage(
-            "未找到 pyside6-uic，请确保 PySide6 已正确安装并配置",
+            "Failed to find pyside6-uic, please ensure PySide6 is installed and configured correctly",
         );
         return;
     }
@@ -103,13 +128,15 @@ async function compileUIWithUIC(uri) {
 
     exec(command, (error, stdout, stderr) => {
         if (error) {
-            vscode.window.showErrorMessage(`编译失败: ${error.message}`);
-            console.error("编译错误:", error);
+            vscode.window.showErrorMessage(
+                `Failed to compile UI: ${error.message}`,
+            );
+            console.error("Compilation error:", error);
             return;
         }
 
         vscode.window.showInformationMessage(
-            `UI 文件已编译: ${path.basename(outputPath)}`,
+            `UI file compiled successfully: ${path.basename(outputPath)}`,
         );
 
         // 打开编译后的文件
@@ -137,12 +164,14 @@ async function getUIFilePath(uri) {
     }
 
     if (!filePath) {
-        vscode.window.showErrorMessage("请先打开或选择一个 .ui 文件");
+        vscode.window.showErrorMessage(
+            "Please open or select a .ui file first",
+        );
         return undefined;
     }
 
     if (!filePath.endsWith(".ui")) {
-        vscode.window.showErrorMessage("请选择 .ui 文件");
+        vscode.window.showErrorMessage("Please select a .ui file");
         return undefined;
     }
 
@@ -253,7 +282,7 @@ async function getUICPath() {
  * 停用扩展
  */
 function deactivate() {
-    console.log("PySide6 Tools 扩展已停用");
+    console.log("PySide6 Tools extension deactivated");
 }
 
 module.exports = {

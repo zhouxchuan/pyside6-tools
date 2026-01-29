@@ -1,3 +1,10 @@
+## [1.2.0]
+
+### Added
+
+- Auto-compile feature: Automatically compile UI files when saved
+- Added `autoCompile` configuration option
+
 ## [1.1.0]
 
 ### Added
