@@ -99,5 +99,8 @@
     },
     "scripts": {
         "package": "vsce package"
+    },
+    "dependencies": {
+        "@vscode/vsce": "^3.7.1"
     }
 }
