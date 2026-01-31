@@ -1,62 +1,37 @@
-const vscode = require("vscode");
-const path = require("path");
-const { exec } = require("child_process");
-const os = require("os");
+import * as vscode from "vscode";
+import * as path from "path";
+import { exec } from "child_process";
+import * as os from "os";
 
 /**
  * 激活扩展
  * @param {vscode.ExtensionContext} context
  */
-function activate(context) {
+export function activate(context: vscode.ExtensionContext) {
     console.log("PySide6 Tools extension is now active");
 
     // 注册打开 Designer 命令
-    let openDesigner = vscode.commands.registerCommand(
+    const openDesigner = vscode.commands.registerCommand(
         "pyside6.openDesigner",
-        async (uri) => {
-            try {
-                await openInDesigner(uri);
-            } catch (error) {
-                vscode.window.showErrorMessage(
-                    `Failed to open Designer: ${error.message}`,
-                );
-            }
-        },
+        async (uri) => { await openInDesigner(uri); },
     );
 
     // 注册编译 UI 命令
-    let compileUI = vscode.commands.registerCommand(
+    const compileUI = vscode.commands.registerCommand(
         "pyside6.compileUI",
-        async (uri) => {
-            try {
-                await compileUIWithUIC(uri);
-            } catch (error) {
-                vscode.window.showErrorMessage(
-                    `Failed to compile UI: ${error.message}`,
-                );
-            }
-        },
+        async (uri) => { await compileUIWithUIC(uri); }
     );
 
     // 注册文件保存事件监听器，实现自动编译
-    let saveListener = vscode.workspace.onDidSaveTextDocument(
+    const saveListener = vscode.workspace.onDidSaveTextDocument(
         async (document) => {
             // 检查是否是 .ui 文件
             if (document.fileName.endsWith(".ui")) {
                 // 检查自动编译配置是否开启
                 const config = vscode.workspace.getConfiguration("pyside6");
-                const autoCompile = config.get("autoCompile");
-
+                const autoCompile = config.get<boolean>("autoCompile");
                 if (autoCompile) {
-                    try {
-                        await compileUIWithUIC(
-                            vscode.Uri.file(document.fileName),
-                        );
-                    } catch (error) {
-                        vscode.window.showErrorMessage(
-                            `Failed to auto-compile UI: ${error.message}`,
-                        );
-                    }
+                    await compileUIWithUIC(vscode.Uri.file(document.fileName));
                 }
             }
         },
@@ -68,12 +43,19 @@ function activate(context) {
 }
 
 /**
+ * 停用扩展
+ */
+export function deactivate() {
+    console.log("PySide6 Tools extension deactivated");
+}
+
+/**
  * 在 PySide6 Designer 中打开 UI 文件
  * @param {vscode.Uri} uri
  */
-async function openInDesigner(uri) {
+async function openInDesigner(uri: vscode.Uri | undefined) {
     const filePath = await getUIFilePath(uri);
-    if (!filePath) return;
+    if (!filePath) { return; }
 
     const designerPath = await getDesignerPath();
     if (!designerPath) {
@@ -86,7 +68,7 @@ async function openInDesigner(uri) {
     // 启动 Designer
     const command = `"${designerPath}" "${filePath}"`;
 
-    exec(command, (error, stdout, stderr) => {
+    exec(command, (error) => {
         if (error) {
             vscode.window.showErrorMessage(
                 `Failed to start Designer: ${error.message}`,
@@ -102,9 +84,9 @@ async function openInDesigner(uri) {
  * 使用 PySide6 UIC 编译 UI 文件
  * @param {vscode.Uri} uri
  */
-async function compileUIWithUIC(uri) {
+async function compileUIWithUIC(uri: vscode.Uri | undefined) {
     const filePath = await getUIFilePath(uri);
-    if (!filePath) return;
+    if (!filePath) { return; }
 
     const uicPath = await getUICPath();
     if (!uicPath) {
@@ -126,7 +108,7 @@ async function compileUIWithUIC(uri) {
     // 执行编译命令
     const command = `"${uicPath}" "${filePath}" -o "${outputPath}"`;
 
-    exec(command, (error, stdout, stderr) => {
+    exec(command, (error) => {
         if (error) {
             vscode.window.showErrorMessage(
                 `Failed to compile UI: ${error.message}`,
@@ -151,7 +133,7 @@ async function compileUIWithUIC(uri) {
  * @param {vscode.Uri} uri
  * @returns {Promise<string|undefined>}
  */
-async function getUIFilePath(uri) {
+async function getUIFilePath(uri: vscode.Uri | undefined) {
     let filePath;
 
     if (uri && uri.fsPath) {
@@ -183,7 +165,9 @@ async function getUIFilePath(uri) {
  * @param {string} filePath
  * @returns {Promise<boolean>}
  */
-async function fileExists(filePath) {
+async function fileExists(filePath: string | undefined) {
+    if (!filePath) { return false; }
+
     try {
         await vscode.workspace.fs.stat(vscode.Uri.file(filePath));
         return true;
@@ -197,7 +181,9 @@ async function fileExists(filePath) {
  * @param {string} executableName
  * @returns {Promise<string|undefined>}
  */
-async function findInPath(executableName) {
+async function findInPath(executableName: string | undefined) {
+    if (!executableName) { return undefined; }
+
     const pathEnv = process.env.PATH || "";
     const paths = pathEnv.split(path.delimiter);
 
@@ -218,7 +204,7 @@ async function getDesignerPath() {
     const config = vscode.workspace.getConfiguration("pyside6");
 
     // 首先检查用户配置的路径
-    const configuredPath = config.get("designerPath");
+    const configuredPath = config.get<string>("designerPath");
     if (configuredPath && (await fileExists(configuredPath))) {
         return configuredPath;
     }
@@ -253,7 +239,7 @@ async function getUICPath() {
     const config = vscode.workspace.getConfiguration("pyside6");
 
     // 首先检查用户配置的路径
-    const configuredPath = config.get("uicPath");
+    const configuredPath = config.get<string>("uicPath");
     if (configuredPath && (await fileExists(configuredPath))) {
         return configuredPath;
     }
@@ -278,14 +264,4 @@ async function getUICPath() {
     return findInPath(executableName);
 }
 
-/**
- * 停用扩展
- */
-function deactivate() {
-    console.log("PySide6 Tools extension deactivated");
-}
 
-module.exports = {
-    activate,
-    deactivate,
-};

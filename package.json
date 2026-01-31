@@ -1,105 +1,112 @@
 {
-    "name": "pyside6-tools",
-    "displayName": "PySide6 Tools",
-    "description": "Qt Designer and UI Compiler Tools for PySide6",
-    "version": "1.2.0",
-    "publisher": "zhou-xiao-chuan",
-    "repository": {
-        "url": "https://gitee.com/zhou-xiao-chuan/pyside6-tools"
-    },
-    "engines": {
-        "vscode": "^1.60.0"
-    },
-    "categories": [
-        "Other"
-    ],
-    "keywords": [
-        "qt",
-        "designer",
-        "uic",
-        "pyside6"
-    ],
-    "icon": "extension/images/icon.png",
-    "main": "./extension.js",
-    "files": [
-        "extension.js",
-        "extension/images/icon.png",
-        "CHANGELOG.md",
-        "LICENSE",
-        "README.md"
-    ],
-    "activationEvents": [
-        "workspaceContains:**/*.ui"
-    ],
-    "contributes": {
-        "commands": [
-            {
-                "command": "pyside6.openDesigner",
-                "title": "Open in PySide6 Designer",
-                "category": "PySide6"
-            },
-            {
-                "command": "pyside6.compileUI",
-                "title": "Compile UI with PySide6 UIC",
-                "category": "PySide6"
-            }
-        ],
-        "menus": {
-            "editor/context": [
-                {
-                    "command": "pyside6.openDesigner",
-                    "group": "PySide6@1",
-                    "when": "resourceExtname == .ui"
-                },
-                {
-                    "command": "pyside6.compileUI",
-                    "group": "PySide6@2",
-                    "when": "resourceExtname == .ui"
-                }
-            ],
-            "explorer/context": [
-                {
-                    "command": "pyside6.openDesigner",
-                    "group": "PySide6@1",
-                    "when": "resourceExtname == .ui"
-                },
-                {
-                    "command": "pyside6.compileUI",
-                    "group": "PySide6@2",
-                    "when": "resourceExtname == .ui"
-                }
-            ]
-        },
-        "configuration": {
-            "title": "PySide6 Tools",
-            "properties": {
-                "pyside6.designerPath": {
-                    "type": "string",
-                    "default": "",
-                    "description": "Path to pyside6-designer executable"
-                },
-                "pyside6.uicPath": {
-                    "type": "string",
-                    "default": "",
-                    "description": "Path to pyside6-uic executable"
-                },
-                "pyside6.outputSuffix": {
-                    "type": "string",
-                    "default": "_ui",
-                    "description": "Suffix for compiled UI files"
-                },
-                "pyside6.autoCompile": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Automatically compile UI files when saved"
-                }
-            }
-        }
-    },
-    "devDependencies": {
-        "@vscode/vsce": "^3.7.1"
-    },
-    "scripts": {
-        "package": "vsce package"
-    }
+	"name": "pyside6-tools",
+	"displayName": "PySide6 Tools",
+	"description": "Qt Designer and UI Compiler Tools for PySide6",
+	"version": "1.2.1",
+	"publisher": "zhou-xiao-chuan",
+	"repository": {
+		"url": "https://gitee.com/zhou-xiao-chuan/pyside6-tools"
+	},
+	"engines": {
+		"vscode": "^1.100.0"
+	},
+	"categories": [
+		"Other"
+	],
+	"keywords": [
+		"qt",
+		"designer",
+		"uic",
+		"pyside6"
+	],
+	"activationEvents": [
+		"workspaceContains:**/*.ui"
+	],
+	"icon": "icon.png",
+	"main": "./out/extension.js",
+	"contributes": {
+		"commands": [
+			{
+				"command": "pyside6.openDesigner",
+				"title": "Open in PySide6 Designer",
+				"category": "PySide6"
+			},
+			{
+				"command": "pyside6.compileUI",
+				"title": "Compile UI with PySide6 UIC",
+				"category": "PySide6"
+			}
+		],
+		"menus": {
+			"editor/context": [
+				{
+					"command": "pyside6.openDesigner",
+					"group": "PySide6@1",
+					"when": "resourceExtname == .ui"
+				},
+				{
+					"command": "pyside6.compileUI",
+					"group": "PySide6@2",
+					"when": "resourceExtname == .ui"
+				}
+			],
+			"explorer/context": [
+				{
+					"command": "pyside6.openDesigner",
+					"group": "PySide6@1",
+					"when": "resourceExtname == .ui"
+				},
+				{
+					"command": "pyside6.compileUI",
+					"group": "PySide6@2",
+					"when": "resourceExtname == .ui"
+				}
+			]
+		},
+		"configuration": {
+			"title": "PySide6 Tools",
+			"properties": {
+				"pyside6.designerPath": {
+					"type": "string",
+					"default": "",
+					"description": "Path to pyside6-designer executable"
+				},
+				"pyside6.uicPath": {
+					"type": "string",
+					"default": "",
+					"description": "Path to pyside6-uic executable"
+				},
+				"pyside6.outputSuffix": {
+					"type": "string",
+					"default": "_ui",
+					"description": "Suffix for compiled UI files"
+				},
+				"pyside6.autoCompile": {
+					"type": "boolean",
+					"default": false,
+					"description": "Automatically compile UI files when saved"
+				}
+			}
+		}
+	},
+	"scripts": {
+		"vscode:prepublish": "npm run compile",
+		"compile": "tsc -p ./",
+		"lint": "eslint",
+		"watch": "tsc -watch -p ./"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.13.0",
+		"@stylistic/eslint-plugin": "^2.9.0",
+		"@types/glob": "^7.1.1",
+		"@types/mocha": "^10.0.1",
+		"@types/node": "^22",
+		"@types/vscode": "^1.100.0",
+		"eslint": "^9.13.0",
+		"glob": "^7.1.4",
+		"mocha": "^10.2.0",
+		"source-map-support": "^0.5.12",
+		"typescript": "^5.9.2",
+		"typescript-eslint": "^8.39.0"
+	}
 }
