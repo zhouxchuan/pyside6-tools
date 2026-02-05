@@ -22,6 +22,12 @@ export function activate(context: vscode.ExtensionContext) {
         async (uri) => { await compileUIWithUIC(uri); }
     );
 
+    // 注册编译 RCC 命令
+    const compileRC = vscode.commands.registerCommand(
+        "pyside6.compileRC",
+        async (uri) => { await compileRCWithRCC(uri); }
+    );
+
     // 注册文件保存事件监听器，实现自动编译
     const saveListener = vscode.workspace.onDidSaveTextDocument(
         async (document) => {
@@ -39,6 +45,7 @@ export function activate(context: vscode.ExtensionContext) {
 
     context.subscriptions.push(openDesigner);
     context.subscriptions.push(compileUI);
+    context.subscriptions.push(compileRC);
     context.subscriptions.push(saveListener);
 }
 
@@ -98,7 +105,7 @@ async function compileUIWithUIC(uri: vscode.Uri | undefined) {
 
     // 获取配置的输出后缀
     const config = vscode.workspace.getConfiguration("pyside6");
-    const outputSuffix = config.get("outputSuffix") || "_ui";
+    const outputSuffix = config.get<string>("uicOutputSuffix") || "_ui";
 
     // 生成输出文件名
     const fileDir = path.dirname(filePath);
@@ -128,36 +135,48 @@ async function compileUIWithUIC(uri: vscode.Uri | undefined) {
     });
 }
 
-/**
- * 获取 UI 文件路径
- * @param {vscode.Uri} uri
- * @returns {Promise<string|undefined>}
- */
-async function getUIFilePath(uri: vscode.Uri | undefined) {
-    let filePath;
+async function compileRCWithRCC(uri: vscode.Uri | undefined) {
+    const filePath = await getRCFilePath(uri);
+    if (!filePath) { return; }
 
-    if (uri && uri.fsPath) {
-        filePath = uri.fsPath;
-    } else {
-        const activeEditor = vscode.window.activeTextEditor;
-        if (activeEditor && activeEditor.document.fileName.endsWith(".ui")) {
-            filePath = activeEditor.document.fileName;
-        }
-    }
-
-    if (!filePath) {
+    const rccPath = await getRCCPath();
+    if (!rccPath) {
         vscode.window.showErrorMessage(
-            "Please open or select a .ui file first",
+            "Failed to find pyside6-rcc, please ensure PySide6 is installed and configured correctly",
         );
-        return undefined;
+        return;
     }
 
-    if (!filePath.endsWith(".ui")) {
-        vscode.window.showErrorMessage("Please select a .ui file");
-        return undefined;
-    }
+    // 获取配置的输出后缀
+    const config = vscode.workspace.getConfiguration("pyside6");
+    const outputSuffix = config.get<string>("rccOutputSuffix") || "_rc";
 
-    return filePath;
+    // 生成输出文件名
+    const fileDir = path.dirname(filePath);
+    const fileName = path.basename(filePath, ".qrc");
+    const outputPath = path.join(fileDir, `${fileName}${outputSuffix}.py`);
+
+    // 执行编译命令
+    const command = `"${rccPath}" "${filePath}" -o "${outputPath}"`;
+
+    exec(command, (error) => {
+        if (error) {
+            vscode.window.showErrorMessage(
+                `Failed to compile RC: ${error.message}`,
+            );
+            console.error("RC Compilation error:", error);
+            return;
+        }
+
+        vscode.window.showInformationMessage(
+            `RC file compiled successfully: ${path.basename(outputPath)}`,
+        );
+
+        // 打开编译后的文件
+        vscode.workspace.openTextDocument(outputPath).then((doc) => {
+            vscode.window.showTextDocument(doc);
+        });
+    });
 }
 
 /**
@@ -265,3 +284,86 @@ async function getUICPath() {
 }
 
 
+async function getRCCPath() {
+    const config = vscode.workspace.getConfiguration("pyside6");
+
+    // 首先检查用户配置的路径
+    const configuredPath = config.get<string>("rccPath");
+    if (configuredPath && (await fileExists(configuredPath))) {
+        return configuredPath;
+    }
+
+    // 检查当前工作区的虚拟环境
+    if (vscode.workspace.workspaceFolders) {
+        const workspacePath = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        const venvScriptsPath = path.join(workspacePath, ".venv", "Scripts");
+        const rccPath = path.join(
+            venvScriptsPath,
+            os.platform() === "win32" ? "pyside6-rcc.exe" : "pyside6-rcc",
+        );
+
+        if (await fileExists(rccPath)) {
+            return rccPath;
+        }
+    }
+
+    // 在系统 PATH 中查找
+    const executableName =
+        os.platform() === "win32" ? "pyside6-rcc.exe" : "pyside6-rcc";
+    return findInPath(executableName);
+}
+
+/**
+ * 获取 UI 文件路径
+ * @param {vscode.Uri} uri
+ * @returns {Promise<string|undefined>}
+ */
+async function getUIFilePath(uri: vscode.Uri | undefined) {
+    let filePath: string | undefined;
+    if (uri && uri.fsPath) {
+        filePath = uri.fsPath;
+    } else {
+        const activeEditor = vscode.window.activeTextEditor;
+        if (activeEditor && activeEditor.document.fileName.endsWith(".ui")) {
+            filePath = activeEditor.document.fileName;
+        }
+    }
+    if (!filePath) {
+        vscode.window.showErrorMessage(
+            "Please open or select a .ui file first",
+        );
+        return undefined;
+    }
+    if (!filePath.endsWith(".ui")) {
+        vscode.window.showErrorMessage("Please select a .ui file");
+        return undefined;
+    }
+    return filePath;
+}
+/**
+ * 获取 RC 文件路径
+ * @param {vscode.Uri} uri
+ * @returns {Promise<string|undefined>}
+ */
+async function getRCFilePath(uri: vscode.Uri | undefined) {
+    let filePath: string | undefined;
+    if (uri && uri.fsPath) {
+        filePath = uri.fsPath;
+    } else {
+        const activeEditor = vscode.window.activeTextEditor;
+        if (activeEditor && activeEditor.document.fileName.endsWith(".qrc")) {
+            filePath = activeEditor.document.fileName;
+        }
+    }
+    if (!filePath) {
+        vscode.window.showErrorMessage(
+            "Please open or select a .qrc file first",
+        );
+        return undefined;
+    }
+    if (!filePath.endsWith(".qrc")) {
+        vscode.window.showErrorMessage("Please select a .qrc file");
+        return undefined;
+    }
+    return filePath;
+}

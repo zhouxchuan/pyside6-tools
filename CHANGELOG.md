@@ -1,3 +1,9 @@
+## [1.2.2]
+
+### Added
+
+- Added `pyside6-rcc` feature
+
 ## [1.2.0]
 
 ### Added

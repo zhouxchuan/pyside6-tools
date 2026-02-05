@@ -2,7 +2,7 @@
 	"name": "pyside6-tools",
 	"displayName": "PySide6 Tools",
 	"description": "Qt Designer and UI Compiler Tools for PySide6",
-	"version": "1.2.1",
+	"version": "1.2.2",
 	"publisher": "zhou-xiao-chuan",
 	"repository": {
 		"url": "https://gitee.com/zhou-xiao-chuan/pyside6-tools"
@@ -17,7 +17,8 @@
 		"qt",
 		"designer",
 		"uic",
-		"pyside6"
+		"pyside6",
+		"rcc"
 	],
 	"activationEvents": [
 		"workspaceContains:**/*.ui"
@@ -35,6 +36,11 @@
 				"command": "pyside6.compileUI",
 				"title": "Compile UI with PySide6 UIC",
 				"category": "PySide6"
+			},
+			{
+				"command": "pyside6.compileRC",
+				"title": "Compile RC with PySide6 RCC",
+				"category": "PySide6"
 			}
 		],
 		"menus": {
@@ -48,6 +54,11 @@
 					"command": "pyside6.compileUI",
 					"group": "PySide6@2",
 					"when": "resourceExtname == .ui"
+				},
+				{
+					"command": "pyside6.compileRC",
+					"group": "PySide6@3",
+					"when": "resourceExtname == .qrc"
 				}
 			],
 			"explorer/context": [
@@ -60,6 +71,11 @@
 					"command": "pyside6.compileUI",
 					"group": "PySide6@2",
 					"when": "resourceExtname == .ui"
+				},
+				{
+					"command": "pyside6.compileRC",
+					"group": "PySide6@3",
+					"when": "resourceExtname == .qrc"
 				}
 			]
 		},
@@ -76,10 +92,20 @@
 					"default": "",
 					"description": "Path to pyside6-uic executable"
 				},
-				"pyside6.outputSuffix": {
+				"pyside6.rccPath": {
+					"type": "string",
+					"default": "",
+					"description": "Path to pyside6-rcc executable"
+				},
+				"pyside6.uicOutputSuffix": {
 					"type": "string",
 					"default": "_ui",
 					"description": "Suffix for compiled UI files"
+				},
+				"pyside6.rccOutputSuffix": {
+					"type": "string",
+					"default": "_rc",
+					"description": "Suffix for compiled RC files"
 				},
 				"pyside6.autoCompile": {
 					"type": "boolean",
