@@ -31,13 +31,16 @@ export function activate(context: vscode.ExtensionContext) {
     // 注册文件保存事件监听器，实现自动编译
     const saveListener = vscode.workspace.onDidSaveTextDocument(
         async (document) => {
-            // 检查是否是 .ui 文件
-            if (document.fileName.endsWith(".ui")) {
-                // 检查自动编译配置是否开启
-                const config = vscode.workspace.getConfiguration("pyside6");
-                const autoCompile = config.get<boolean>("autoCompile");
-                if (autoCompile) {
+            // 检查自动编译配置是否开启
+            const config = vscode.workspace.getConfiguration("pyside6");
+            const autoCompile = config.get<boolean>("autoCompile");
+            if (autoCompile) {
+                if (document.fileName.endsWith(".ui")) {
                     await compileUIWithUIC(vscode.Uri.file(document.fileName));
+                }
+                // 检查是否是 .qrc 文件
+                if (document.fileName.endsWith(".qrc")) {
+                    await compileRCWithRCC(vscode.Uri.file(document.fileName));
                 }
             }
         },
