@@ -21,7 +21,11 @@ To enable auto-compile feature:
 
 1. Open VS Code settings (Ctrl+,)
 2. Search for "PySide6 Tools"
-3. Enable "Auto Compile" option
+3. Set the path to pyside6-designer executable (optional)
+4. Set the path to pyside6-uic executable (optional)
+5. Set the path to pyside6-rcc executable (optional)
+6. Enable "Auto Compile" option
+7. Restart VS Code
 
 ## Configuration
 
